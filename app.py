@@ -517,6 +517,16 @@ with tab6:
                     st.markdown(f'<div class="{get_text_style(entry["target"])}">{entry["translated"]}</div>', unsafe_allow_html=True)
                 st.caption(f"Source: {entry['source']}")
 
+# Feedback Section
+st.divider()
+st.subheader("💬 Feedback")
+
+feedback = st.radio("How was your experience?", ["⭐ Excellent", "👍 Good", "👎 Needs Improvement"])
+comment = st.text_area("Any suggestions? (Optional)")
+
+if st.button("Submit Feedback"):
+    st.success("Thank you for your feedback! ✅")
+
 # Footer
 st.markdown("---")
 st.markdown("""
