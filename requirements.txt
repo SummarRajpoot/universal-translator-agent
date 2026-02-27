@@ -1,0 +1,6 @@
+streamlit
+groq
+speechrecognition
+python-dotenv
+requests
+Pillow
