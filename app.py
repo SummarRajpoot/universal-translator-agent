@@ -22,6 +22,28 @@ st.set_page_config(
     layout="wide"
 )
 
+# SEO Meta Tags
+st.markdown("""
+<head>
+<meta name="description" content="Universal Translator Agent — 
+AI-powered translation tool supporting 30+ world languages. 
+Translate English to Urdu, Arabic, Hindi, Chinese, French instantly!">
+<meta name="keywords" content="urdu translator, arabic translator, 
+ai translation, english to urdu, universal translator, 
+free translator online, bulk translation, pdf translator, 
+image translator, groq ai, python translator">
+<meta name="author" content="M. Sun Rajpoot">
+<meta property="og:title" content="Universal Translator Agent">
+<meta property="og:description" content="AI-powered translation 
+tool supporting 30+ world languages — Built by M. Sun Rajpoot">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Universal Translator Agent">
+<meta name="twitter:description" content="Translate any language 
+instantly with AI — 30+ languages supported!">
+</head>
+""", unsafe_allow_html=True)
+
 # Initialize Session State
 if "history" not in st.session_state:
     st.session_state["history"] = []
