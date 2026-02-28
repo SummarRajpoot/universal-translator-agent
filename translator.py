@@ -12,7 +12,7 @@ def translate_text(text, target_language="Urdu"):
         return "Please enter some text to translate"
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",

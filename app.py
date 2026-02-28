@@ -517,36 +517,31 @@ with tab6:
                     st.markdown(f'<div class="{get_text_style(entry["target"])}">{entry["translated"]}</div>', unsafe_allow_html=True)
                 st.caption(f"Source: {entry['source']}")
 
-# Feedback Section
-st.divider()
-st.subheader("💬 Feedback")
-
-feedback = st.radio("How was your experience?", ["⭐ Excellent", "👍 Good", "👎 Needs Improvement"])
-comment = st.text_area("Any suggestions? (Optional)")
-
-if st.button("Submit Feedback"):
-    st.success("Thank you for your feedback! ✅")
-
 # Footer
 st.markdown("---")
 st.markdown("""
 <style>
 .footer {
     background: linear-gradient(135deg, #1a1a2e, #16213e);
-    padding: 40px;
+    padding: 30px 20px;
     border-radius: 12px;
     margin-top: 20px;
     border-top: 3px solid #e63946;
 }
 .footer-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 30px;
     margin-bottom: 30px;
 }
+@media (min-width: 768px) {
+    .footer-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
 .footer-section h4 {
     color: #e63946;
-    font-size: 16px;
+    font-size: 15px;
     margin-bottom: 12px;
     font-weight: bold;
 }
@@ -554,23 +549,37 @@ st.markdown("""
     color: #a0a0b0;
     font-size: 13px;
     line-height: 1.7;
+    word-break: break-word;
 }
 .footer-section a {
     color: #a0a0b0;
     text-decoration: none;
-    display: block;
-    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
     font-size: 13px;
+    word-break: break-word;
 }
 .footer-section a:hover { color: #e63946; }
+.footer-section a img {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
 .footer-bottom {
     border-top: 1px solid #2a2a4a;
     padding-top: 20px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 10px;
     align-items: center;
+    text-align: center;
 }
-.footer-bottom p { color: #606080; font-size: 12px; }
+.footer-bottom p { 
+    color: #606080; 
+    font-size: 12px; 
+}
 .badge {
     background: #e63946;
     color: white;
@@ -580,7 +589,117 @@ st.markdown("""
     font-weight: bold;
 }
 </style>
+""", unsafe_allow_html=True)
 
+# ── Feedback section rendered via components.html() so that JS is executed ──
+feedback_html = """
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background: transparent; font-family: 'Segoe UI', sans-serif; color: #fff; margin: 0; padding: 0; }
+  .fb-wrap { background: linear-gradient(135deg,#1a1a2e,#16213e); border-radius: 12px; padding: 30px; text-align: center; border-top: 3px solid #e63946; }
+  .fb-wrap h4 { color: #e63946; font-size: 20px; margin-bottom: 8px; }
+  .fb-wrap p  { color: #a0a0b0; margin-bottom: 12px; }
+  .fb-btn { margin: 5px; padding: 8px 20px; border-radius: 20px; border: none; color: white; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+  .fb-btn:hover { transform: scale(1.05); }
+  #exc { background: #4CAF50; }
+  #goo { background: #2196F3; }
+  #imp { background: #e63946; }
+  input, textarea {
+    width: 55%; padding: 10px; border-radius: 10px; border: 1px solid #30363d;
+    background: #161b22; color: #fff; font-size: 14px; display: block;
+    margin: 10px auto 0 auto;
+  }
+  textarea { height: 80px; resize: vertical; }
+  #submitBtn {
+    margin-top: 14px; padding: 10px 30px; border-radius: 20px; border: none;
+    background: #e63946; color: white; font-weight: bold; cursor: pointer; font-size: 15px;
+  }
+  #submitBtn:hover { background: #c0303d; }
+  #thankMsg { display:none; color: #4CAF50; font-weight: bold; margin-top: 12px; }
+  #commentsBox { margin-top: 24px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .comment-card {
+    background: #161b22; padding: 14px; border-radius: 10px;
+    margin-bottom: 10px; border: 1px solid #30363d;
+  }
+  .comment-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .comment-name  { color: #58a6ff; font-weight: bold; }
+  .comment-time  { font-size: 11px; color: #8b949e; }
+  .comment-rating{ color: #e63946; font-size: 13px; margin-bottom: 6px; }
+  .comment-text  { color: #c9d1d9; font-size: 14px; margin: 0; }
+</style>
+</head>
+<body>
+<div class="fb-wrap">
+  <h4>&#128172; Feedback</h4>
+  <p>How was your experience?</p>
+  <div>
+    <button class="fb-btn" id="exc" onclick="pickRating(this)">&#11088; Excellent</button>
+    <button class="fb-btn" id="goo" onclick="pickRating(this)">&#128077; Good</button>
+    <button class="fb-btn" id="imp" onclick="pickRating(this)">&#128078; Needs Improvement</button>
+  </div>
+  <input  id="userName"    placeholder="Your name (Optional)" />
+  <textarea id="feedbackText" placeholder="Write your feedback..."></textarea>
+  <br>
+  <button id="submitBtn" onclick="doSubmit()">Submit Feedback &#9989;</button>
+  <p id="thankMsg">&#9989; Thank you for your feedback!</p>
+  <div id="commentsBox"></div>
+</div>
+
+<script>
+var picked = "";
+
+function pickRating(btn) {
+  document.querySelectorAll('.fb-btn').forEach(function(b) {
+    b.style.opacity = '0.5';
+    b.style.outline = 'none';
+  });
+  btn.style.opacity = '1';
+  btn.style.outline = '3px solid white';
+  picked = btn.innerText;
+}
+
+function doSubmit() {
+  var text = document.getElementById('feedbackText').value.trim();
+  var name = document.getElementById('userName').value.trim() || 'Anonymous';
+  if (!text) { alert('Please write something!'); return; }
+
+  var list = JSON.parse(localStorage.getItem('feedbacks') || '[]');
+  list.push({ name: name, rating: picked, text: text, time: new Date().toLocaleString() });
+  localStorage.setItem('feedbacks', JSON.stringify(list));
+
+  document.getElementById('feedbackText').value = '';
+  document.getElementById('userName').value    = '';
+  document.getElementById('thankMsg').style.display = 'block';
+  setTimeout(function() {
+    document.getElementById('thankMsg').style.display = 'none';
+  }, 3000);
+  renderComments();
+}
+
+function renderComments() {
+  var list = JSON.parse(localStorage.getItem('feedbacks') || '[]');
+  var box  = document.getElementById('commentsBox');
+  if (!box) return;
+  if (!list.length) { box.innerHTML = ''; return; }
+  var html = '<h4 style="color:white;border-bottom:1px solid #30363d;padding-bottom:8px;">&#128172; User Comments</h4>';
+  list.slice().reverse().forEach(function(c) {
+    html += '<div class="comment-card">' +
+      '<div class="comment-header"><span class="comment-name">' + c.name + '</span><span class="comment-time">' + c.time + '</span></div>' +
+      '<div class="comment-rating">' + c.rating + '</div>' +
+      '<p class="comment-text">' + c.text + '</p></div>';
+  });
+  box.innerHTML = html;
+}
+
+renderComments();
+</script>
+</body></html>
+"""
+components.html(feedback_html, height=600, scrolling=True)
+
+st.markdown("""
 <div class="footer">
     <div class="footer-grid">
         <div class="footer-section">
